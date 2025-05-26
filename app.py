@@ -40,33 +40,33 @@ Trained locally using cleaned and preprocessed English-language fake news datase
     menu = ["Home", "Prediction"]
     choice = st.sidebar.selectbox("Menu", menu)
 
-if choice == "Prediction":
-    st.subheader("Fake News Prediction")
-    user_input = st.text_area("Enter a news headline or article (English only):")
+    if choice == "Prediction":
+        st.subheader("Fake News Prediction")
+        user_input = st.text_area("Enter a news headline or article (English only):")
 
-    if st.button("Detect"):
-        if user_input.strip() == "":
-            st.warning("Text cannot be empty.")
-        else:
-            probs = predict_with_prob(user_input)
-            labels_map = {0: "FAKE", 1: "REAL"}
-            pred_label = labels_map[int(np.argmax(probs))]
-            confidence = round(max(probs) * 100, 2)
+        if st.button("Detect"):
+            if user_input.strip() == "":
+                st.warning("Text cannot be empty.")
+            else:
+                probs = predict_with_prob(user_input)
+                labels_map = {0: "FAKE", 1: "REAL"}
+                pred_label = labels_map[int(np.argmax(probs))]
+                confidence = round(max(probs) * 100, 2)
 
             # Tampilkan hasil klasifikasi
-            if pred_label == "REAL":
-                st.success(f"Prediction: **{pred_label}** ({confidence}% confident)")
-            else:
-                st.error(f"Prediction: **{pred_label}** ({confidence}% confident)")
-
+                if pred_label == "REAL":
+                    st.success(f"Prediction: **{pred_label}** ({confidence}% confident)")
+                else:
+                    st.error(f"Prediction: **{pred_label}** ({confidence}% confident)")
+    
             # Chart Probabilitas
-            st.markdown("#### Confidence per class")
-            st.bar_chart({
-                "Confidence": {
-                    "FAKE": probs[0],
-                    "REAL": probs[1]
-                }
-            })
+                st.markdown("#### Confidence per class")
+                st.bar_chart({
+                    "Confidence": {
+                        "FAKE": probs[0],
+                        "REAL": probs[1]
+                    }
+                })
 
 
     # Credit
