@@ -67,7 +67,12 @@ Trained locally using cleaned and preprocessed English-language fake news datase
                         "REAL": probs[1]
                     }
                 })
-
+                
+def predict_with_prob(text):
+    decision = model.decision_function([text])[0]  # hasilnya 1 angka untuk 2 kelas
+    prob_fake = 1 / (1 + np.exp(decision))         # sigmoid untuk kelas FAKE
+    prob_real = 1 - prob_fake
+    return [prob_fake, prob_real]
 
     # Credit
     st.markdown("""---""")
