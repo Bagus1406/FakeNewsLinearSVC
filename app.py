@@ -1,5 +1,6 @@
 import streamlit as st
 import pickle
+import numpy as np
 
 # Load model and label encoder
 @st.cache_resource
@@ -12,11 +13,12 @@ def load_model():
 
 model, le = load_model()
 
-# Prediction function
-def predict(text):
-    pred = model.predict([text])[0]
-    label = le.inverse_transform([pred])[0]
-    return label, 100.0
+# Prediction with pseudo-probability using decision function
+def predict_with_prob(text):
+    decision = model.decision_function([text])[0]
+    prob_fake = 1 / (1 + np.exp(decision))         # sigmoid untuk kelas FAKE
+    prob_real = 1 - prob_fake
+    return [prob_fake, prob_real]
 
 # Streamlit UI
 def main():
@@ -53,13 +55,11 @@ Trained locally using cleaned and preprocessed English-language fake news datase
                 pred_label = labels_map[int(np.argmax(probs))]
                 confidence = round(max(probs) * 100, 2)
 
-            # Tampilkan hasil klasifikasi
                 if pred_label == "REAL":
                     st.success(f"Prediction: **{pred_label}** ({confidence}% confident)")
                 else:
                     st.error(f"Prediction: **{pred_label}** ({confidence}% confident)")
-    
-            # Chart Probabilitas
+
                 st.markdown("#### Confidence per class")
                 st.bar_chart({
                     "Confidence": {
@@ -67,14 +67,8 @@ Trained locally using cleaned and preprocessed English-language fake news datase
                         "REAL": probs[1]
                     }
                 })
-                
-def predict_with_prob(text):
-    decision = model.decision_function([text])[0]  # hasilnya 1 angka untuk 2 kelas
-    prob_fake = 1 / (1 + np.exp(decision))         # sigmoid untuk kelas FAKE
-    prob_real = 1 - prob_fake
-    return [prob_fake, prob_real]
 
-    # Credit
+    # Credit (let it stay outside the if)
     st.markdown("""---""")
     st.markdown(
         """
